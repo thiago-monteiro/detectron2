@@ -61,7 +61,8 @@ class TrainingSampler(Sampler):
 
     def _infinite_indices(self):
         g = torch.Generator()
-        g.manual_seed(self._seed)
+        if self._seed is not None:
+            g.manual_seed(self._seed)
         while True:
             if self._shuffle:
                 yield from torch.randperm(self._size, generator=g).tolist()
@@ -190,11 +191,7 @@ class RepeatFactorTrainingSampler(Sampler):
         category_rep = {
             cat_id: max(
                 1.0,
-                (
-                    math.sqrt(repeat_thresh / cat_freq)
-                    if sqrt
-                    else (repeat_thresh / cat_freq)
-                ),
+                (math.sqrt(repeat_thresh / cat_freq) if sqrt else (repeat_thresh / cat_freq)),
             )
             for cat_id, cat_freq in category_freq.items()
         }
